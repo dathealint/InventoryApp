@@ -10,14 +10,16 @@ public class Product {
 
 	private long id;
 	private String name;
-	private boolean completed;
-	private int remindTime;
-	private int repeatMode;
-	private int repeatModeValue;
+	private int price;
+	private int quantity;
 	private Date createdDate;
-	private Date completedDate;
-
 	private String thumnailPath = null;
+
+	//foreign key to Supplier table
+	private long supplierId;
+
+	// supplier name will be queried from database, not a property of Product
+	private String supplierName;
 
 	public long getId() {
 		return id;
@@ -35,36 +37,20 @@ public class Product {
 		this.name = name;
 	}
 
-	public boolean isCompleted() {
-		return completed;
+	public int getPrice() {
+		return price;
 	}
 
-	public void setCompleted(boolean completed) {
-		this.completed = completed;
+	public void setPrice(int price) {
+		this.price = price;
 	}
 
-	public int getRemindTime() {
-		return remindTime;
+	public int getQuantity() {
+		return quantity;
 	}
 
-	public void setRemindTime(int remindTime) {
-		this.remindTime = remindTime;
-	}
-
-	public int getRepeatMode() {
-		return repeatMode;
-	}
-
-	public void setRepeatMode(int repeatMode) {
-		this.repeatMode = repeatMode;
-	}
-
-	public int getRepeatModeValue() {
-		return repeatModeValue;
-	}
-
-	public void setRepeatModeValue(int repeatModeValue) {
-		this.repeatModeValue = repeatModeValue;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 
 	public Date getCreatedDate() {
@@ -75,19 +61,27 @@ public class Product {
 		this.createdDate = createdDate;
 	}
 
-	public Date getCompletedDate() {
-		return completedDate;
-	}
-
-	public void setCompletedDate(Date completedDate) {
-		this.completedDate = completedDate;
-	}
-
 	public String getThumnailPath() {
 		return thumnailPath;
 	}
 
 	public void setThumnailPath(String thumnailPath) {
 		this.thumnailPath = thumnailPath;
+	}
+
+	public long getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(long supplierId) {
+		this.supplierId = supplierId;
+	}
+
+	public String getSupplierName() {
+		return supplierName;
+	}
+
+	public void setSupplierName(String supplierName) {
+		this.supplierName = supplierName;
 	}
 }

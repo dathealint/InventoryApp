@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import datnguyen.com.inventoryapp.data.Product;
+import datnguyen.com.inventoryapp.data.ProductDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,24 +30,28 @@ public class MainActivity extends AppCompatActivity {
 		return mSharedInstance;
 	}
 
+	ProductDbHelper mDbHelper;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		mSharedInstance = this;
 
 		searchView = (SearchView) findViewById(R.id.searchView);
 		recycleView = (RecyclerView) findViewById(R.id.recycleView);
 		tvErrorMessage = (TextView) findViewById(R.id.tvErrorMessage);
 		tvErrorMessage.setVisibility(View.GONE);
 
+		mSharedInstance = this;
+
+		mDbHelper = new ProductDbHelper(this);
+		mDbHelper.insertDummySuppliers();
+
 		// test
 		{
 			Product product = new Product();
 			product.setName("Product 1");
 			productList.add(product);
-
 		}
 
 		{
@@ -61,5 +66,7 @@ public class MainActivity extends AppCompatActivity {
 		recycleView.setLayoutManager(mLayoutManager);
 		recycleView.setItemAnimator(new DefaultItemAnimator());
 		recycleView.setAdapter(productAdapter);
+
 	}
+
 }
