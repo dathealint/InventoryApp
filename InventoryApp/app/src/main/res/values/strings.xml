@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">InventoryApp</string>
+    <string name="search_hint">Enter some text to search stories...</string>
+    <string name="text_no_result">No matching stories found! Try another keyword!</string>
+</resources>
