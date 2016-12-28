@@ -1,5 +1,7 @@
 package datnguyen.com.inventoryapp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import datnguyen.com.inventoryapp.data.ProductDbHelper;
 import datnguyen.com.inventoryapp.data.Supplier;
 
 import static datnguyen.com.inventoryapp.Constants.EXTRA_PRODUCT_KEY;
+import static datnguyen.com.inventoryapp.Constants.EXTRA_UPDATE_PRODUCT_RESULT_KEY;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_FAILURE;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_SUCCESS;
 import static datnguyen.com.inventoryapp.data.ProductDbHelper.INSERTION_FAIL_CODE;
@@ -62,13 +65,17 @@ public class NewProductActivity extends AppCompatActivity {
 				// save to database
 				ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
 				long insertResult = mDbHelper.insertOrUpdateProduct(product);
+				Intent resultIntent = new Intent();
+
 				if (insertResult == INSERTION_FAIL_CODE) {
-					setResult(RESULT_CODE_EDIT_PRODUCT_SUCCESS);
+					resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
 				} else {
-					setResult(RESULT_CODE_EDIT_PRODUCT_FAILURE);
+					resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
 				}
 
-				finishActivity(MainActivity.REQUEST_CODE_EDIT_PRODUCT);
+				setResult(Activity.RESULT_OK, resultIntent);
+
+				finish();
 			}
 		});
 
