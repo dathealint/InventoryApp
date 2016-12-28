@@ -82,7 +82,6 @@ public class NewProductActivity extends AppCompatActivity {
 		imvProduct = (ImageView) findViewById(R.id.imvProduct);
 
 		registerButtonEventHandlers();
-
 		spinnerSupplier.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -97,6 +96,7 @@ public class NewProductActivity extends AppCompatActivity {
 
 			}
 		});
+
 
 		// get product out of bundle
 		if (getIntent().getExtras() != null) {
@@ -255,7 +255,6 @@ public class NewProductActivity extends AppCompatActivity {
 			finish();
 		}
 
-
 	}
 
 	private void contactSupplier() {
@@ -293,7 +292,7 @@ public class NewProductActivity extends AppCompatActivity {
 			spinnerDataSource.add(supplier.getName());
 		}
 		// fill data to spinner
-		ArrayAdapter<Supplier> supplierAdapter = new ArrayAdapter(this, R.layout.supplier_row_layout, spinnerDataSource);
+		ArrayAdapter<Supplier> supplierAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, spinnerDataSource);
 		spinnerSupplier.setAdapter(supplierAdapter);
 
 		refreshUI();

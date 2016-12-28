@@ -97,6 +97,10 @@ public class Product implements Serializable {
 	}
 
 	public File getImageFile() {
+		if (getThumnailPath() == null) {
+			return null;
+		}
+
 		File pictureFile = Product.getOutputImageFile(getThumnailPath());
 		return pictureFile;
 	}

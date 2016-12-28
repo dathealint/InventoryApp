@@ -399,7 +399,6 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			supplier.setName("Supplier B");
 			supplier.setTel("+6511111");
 			supplier.setAddress("+test address B");
-			supplier.setEmail("emailB@gmail.com");
 			insertOrUpdateSupplier(supplier);
 		}
 
@@ -407,7 +406,6 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			Supplier supplier = new Supplier();
 
 			supplier.setName("Supplier C");
-			supplier.setTel("999999");
 			supplier.setAddress("+test address C");
 			supplier.setEmail("email_supplier_C@gmail.com");
 			insertOrUpdateSupplier(supplier);

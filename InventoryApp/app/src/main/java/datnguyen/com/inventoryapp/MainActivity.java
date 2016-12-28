@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
 		// when in need to create dummy data, chagne to true.
 		// switch to false to persist data so creating new or deleting products will have changes we can see and test
-		boolean createDummyData = false;
+		boolean createDummyData = true;
 		if (createDummyData) {
 			mDbHelper.deleteAllSuppliers();
 			mDbHelper.insertDummySuppliers();
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
 				product.setName("Product 1");
 				product.setPrice(350);
 				product.setQuantity(30);
-				product.setThumnailPath("product1.jpg");
 				product.setSupplierId(listSup.get(0).getId());
 
 				// insert to db
@@ -98,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 				product.setName("Product 2");
 				product.setPrice(1000);
 				product.setQuantity(5);
-				product.setThumnailPath("product2.jpg");
 				product.setSupplierId(listSup.get(1).getId());
 
 				// insert to db
