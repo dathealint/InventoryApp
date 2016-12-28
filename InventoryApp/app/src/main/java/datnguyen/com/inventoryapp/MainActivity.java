@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
 		// when in need to create dummy data, chagne to true.
 		// switch to false to persist data so creating new or deleting products will have changes we can see and test
-		boolean createDummyData = true;
+		boolean createDummyData = false;
 		if (createDummyData) {
 			mDbHelper.deleteAllSuppliers();
 			mDbHelper.insertDummySuppliers();
