@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -97,12 +98,18 @@ public class NewProductActivity extends AppCompatActivity {
 			}
 		});
 
-
 		// get product out of bundle
+		ViewGroup viewEditActions = (ViewGroup) findViewById(R.id.viewEditActions);
 		if (getIntent().getExtras() != null) {
 			this.product = (Product) getIntent().getExtras().getSerializable(EXTRA_PRODUCT_KEY);
+
+			// show edit actions view
+			viewEditActions.setVisibility(View.VISIBLE);
 		} else {
 			this.product = new Product();
+
+			// show edit actions view
+			viewEditActions.setVisibility(View.GONE);
 		}
 
 		reloadData();
@@ -145,8 +152,14 @@ public class NewProductActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View view) {
 				// decrease quantity by 1, minimum 0
-				int newQuantity = Math.max(product.getQuantity() - 1, 0);
-				product.setQuantity(newQuantity);
+				int quantity;
+				if (TextUtils.isEmpty(txtQuantity.getText().toString())) {
+					quantity = 0;
+				} else {
+					quantity = Integer.valueOf(txtQuantity.getText().toString());
+				}
+				quantity = Math.max(quantity - 1, 0);
+				product.setQuantity(quantity);
 
 				refreshUI();
 			}

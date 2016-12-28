@@ -109,22 +109,16 @@
                     android:text="Select Image"/>
 
                 <Button
-                    android:id="@+id/btnSale"
+                    android:id="@+id/btnSave"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Sale"/>
-
-                <Button
-                    android:id="@+id/btnOrder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="Order more"/>
+                    android:text="Save"/>
 
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/viewEditActions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -139,11 +133,18 @@
                     android:text="Delete"/>
 
                 <Button
-                    android:id="@+id/btnSave"
+                    android:id="@+id/btnSale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Save"/>
+                    android:text="Sale"/>
+
+                <Button
+                    android:id="@+id/btnOrder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="Order more"/>
 
             </LinearLayout>
 
