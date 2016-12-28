@@ -28,6 +28,12 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 	private boolean isLoadingmore = false;
 
 	private ArrayList<Product> productList;
+	private View.OnClickListener onClickListener;
+
+	public void setOnClickProductListener(View.OnClickListener onClickListener) {
+		this.onClickListener = onClickListener;
+	}
+
 	public ProductAdapter(ArrayList<Product> list) {
 		this.productList = list;
 	}
@@ -41,7 +47,7 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 	}
 
 	// nested class for ViewHolder
-	public static class ProductHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+	public static class ProductHolder extends RecyclerView.ViewHolder {
 
 		private ImageView imvThumb = null;
 		private TextView tvTitle = null;
@@ -51,8 +57,6 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 			super(itemView);
 			this.imvThumb = (ImageView) itemView.findViewById(R.id.imvThumb);
 			this.tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-
-			itemView.setOnClickListener(this);
 		}
 
 		public void bindProduct(Product product) {
@@ -68,11 +72,6 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 			}
 		}
 
-		@Override
-		public void onClick(View view) {
-			Log.v("ProductHolder", "DID CLICK HOLDER");
-
-		}
 	}
 
 	public static class LoadmoreHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -114,6 +113,8 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 		if (holder instanceof ProductHolder) {
 			Product product = productList.get(position);
 			((ProductHolder) holder).bindProduct(product);
+			holder.itemView.setTag(position);
+			holder.itemView.setOnClickListener(onClickListener);
 		} else {
 			((LoadmoreHolder) holder).bindLoadmore(true);
 //			if (!isLoadingmore && loadmoreInterface != null && position == newsList.size()) {

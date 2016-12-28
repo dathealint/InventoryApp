@@ -1,5 +1,6 @@
 package datnguyen.com.inventoryapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -17,9 +18,14 @@ import datnguyen.com.inventoryapp.data.Product;
 import datnguyen.com.inventoryapp.data.ProductDbHelper;
 import datnguyen.com.inventoryapp.data.Supplier;
 
+import static datnguyen.com.inventoryapp.Constants.EXTRA_PRODUCT_KEY;
+
 public class MainActivity extends AppCompatActivity {
 
 	private final String TAG_VIEW = getClass().getSimpleName();
+	public static final int REQUEST_CODE_EDIT_PRODUCT = 100;
+	public static final int RESULT_CODE_EDIT_PRODUCT_SUCCESS = 101;
+	public static final int RESULT_CODE_EDIT_PRODUCT_FAILURE = 102;
 
 	private SearchView searchView = null;
 	private RecyclerView recycleView = null;
@@ -48,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
 		mSharedInstance = this;
 
-		mDbHelper = new ProductDbHelper(this);
+		mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
 		mDbHelper.deleteAllSuppliers();
 		mDbHelper.insertDummySuppliers();
 
@@ -68,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 			product.setSupplierId(listSup.get(0).getId());
 
 			// insert to db
-			mDbHelper.insertProduct(product);
+			mDbHelper.insertOrUpdateProduct(product);
 		}
 
 		{
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 			product.setSupplierId(listSup.get(1).getId());
 
 			// insert to db
-			mDbHelper.insertProduct(product);
+			mDbHelper.insertOrUpdateProduct(product);
 		}
 
 		// test
@@ -93,10 +99,8 @@ public class MainActivity extends AppCompatActivity {
 			product.setSupplierId(listSup.get(2).getId());
 
 			// insert to db
-			mDbHelper.insertProduct(product);
+			mDbHelper.insertOrUpdateProduct(product);
 		}
-
-		productList = mDbHelper.getAllProducts();
 
 		productAdapter = new ProductAdapter(productList);
 
@@ -104,6 +108,22 @@ public class MainActivity extends AppCompatActivity {
 		recycleView.setLayoutManager(mLayoutManager);
 		recycleView.setItemAnimator(new DefaultItemAnimator());
 		recycleView.setAdapter(productAdapter);
+
+		productAdapter.setOnClickProductListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				// get position
+				int position = (int)view.getTag();
+				Product product = productList.get(position);
+				// open detail view
+				Intent intent = new Intent(getApplicationContext(), NewProductActivity.class);
+
+				// pass data
+				intent.putExtra(EXTRA_PRODUCT_KEY, product);
+
+				startActivityForResult(intent, REQUEST_CODE_EDIT_PRODUCT);
+			}
+		});
 
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
@@ -128,6 +148,17 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
+		// reload data
+		reloadData();
+
+	}
+
+	private void reloadData() {
+		ArrayList<Product> allRecords = mDbHelper.getAllProducts();
+
+		productList.clear();
+		productList.addAll(allRecords);
+		productAdapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -149,4 +180,20 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.v(TAG_VIEW, "onActivityResult requestCode: " + requestCode + " - resultCode: " + resultCode);
+		switch (requestCode) {
+			case REQUEST_CODE_EDIT_PRODUCT:
+			{
+				if (resultCode == RESULT_CODE_EDIT_PRODUCT_SUCCESS) {
+					// update db
+					reloadData();
+				} else {
+					// update error, do nothing
+				}
+			}
+				break;
+		}
+	}
 }

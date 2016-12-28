@@ -5,4 +5,8 @@ package datnguyen.com.inventoryapp;
  */
 
 public class Constants {
+
+	public final static String EXTRA_PRODUCT_KEY = "product";
+	public static final int INVALID_ID = -1;
+
 }

@@ -1,14 +1,17 @@
 package datnguyen.com.inventoryapp.data;
 
+import java.io.Serializable;
 import java.util.Date;
+
+import static datnguyen.com.inventoryapp.Constants.INVALID_ID;
 
 /**
  * Created by datnguyen on 12/27/16.
  */
 
-public class Supplier {
+public class Supplier implements Serializable {
 
-	public static final int INVALID_ID = -1;
+
 	private long id = INVALID_ID;
 	private String name;
 	private String address;

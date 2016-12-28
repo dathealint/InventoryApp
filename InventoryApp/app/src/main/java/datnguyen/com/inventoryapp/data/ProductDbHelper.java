@@ -15,6 +15,8 @@ import java.util.Date;
 import datnguyen.com.inventoryapp.data.SupplierContract.*;
 import datnguyen.com.inventoryapp.data.ProductContract.*;
 
+import static datnguyen.com.inventoryapp.Constants.INVALID_ID;
+
 /**
  * Created by datnguyen on 12/27/16.
  */
@@ -25,8 +27,20 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "product.db";
 	public static final int INSERTION_FAIL_CODE = -1;
 
-	public ProductDbHelper(Context context) {
+	private static ProductDbHelper sharedInstance = null;
+
+	private ProductDbHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	}
+
+	public static ProductDbHelper getDbHelper(Context context) {
+
+		synchronized (ProductDbHelper.class) {
+			if (sharedInstance == null) {
+				sharedInstance = new ProductDbHelper(context);
+			}
+		}
+		return sharedInstance;
 	}
 
 	@Override
@@ -83,7 +97,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	 * @param product object to insert
 	 * @return rowId of newly inserted Product, or -1 if insertion fails.
 	 */
-	public long insertProduct(Product product) {
+	public long insertOrUpdateProduct(Product product) {
 		long insertResult = INSERTION_FAIL_CODE;
 
 		SQLiteDatabase database = getWritableDatabase();
@@ -93,6 +107,11 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 		try {
 			// insert query
 			ContentValues values = new ContentValues();
+
+			if (product.getId() != INVALID_ID) {
+				// put Id to values, so database can replace/update if exists
+				values.put(ProductEntry._ID, product.getId());
+			}
 
 			// put info to content values
 			values.put(ProductEntry.COLUMN_NAME, product.getName());
@@ -107,11 +126,11 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			Date createdDate = product.getCreatedDate();
 			if (createdDate == null) {
 				createdDate = new Date();
+				values.put(ProductEntry.COLUMN_CREATED_DATE, createdDate.getTime());
 			}
-			values.put(ProductEntry.COLUMN_CREATED_DATE, createdDate.getTime());
 
 			// run the insert statement
-			insertResult = database.insert(ProductEntry.TABLE_NAME, null, values);
+			insertResult = database.insertWithOnConflict(ProductEntry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 			database.setTransactionSuccessful();
 
 		} catch (Exception ex) {
@@ -291,7 +310,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			// insert query
 			ContentValues values = new ContentValues();
 
-			if (supplier.getId() != Supplier.INVALID_ID) {
+			if (supplier.getId() != INVALID_ID) {
 				// put Id to values, so database can replace/update if exists
 				values.put(SupplierEntry._ID, supplier.getId());
 			}
