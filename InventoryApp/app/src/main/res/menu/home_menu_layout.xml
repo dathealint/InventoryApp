@@ -5,10 +5,9 @@
       tools:context=".MainActivity">
 
     <item android:id="@+id/menuAdd"
-        android:title="@string/menu_item_add"
+          android:title="@string/menu_item_add"
           android:icon="@drawable/ic_add_white_24dp"
-          android:showAsAction="ifRoom"
-          tools:ignore="AppCompatResource">
+          app:showAsAction="ifRoom|withText">
     </item>
 
 </menu>
