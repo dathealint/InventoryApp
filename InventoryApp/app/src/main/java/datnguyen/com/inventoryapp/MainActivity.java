@@ -143,6 +143,28 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
+		productAdapter.setOnBtnSaleClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+
+				// hide keyboard and remove focus of searchbar
+				searchView.clearFocus();
+
+				// reduce quantity by 1 and update database
+				// get position
+				int position = (int) view.getTag();
+				Product product = productList.get(position);
+
+				int quantity = Math.max(product.getQuantity() - 1, 0);
+				product.setQuantity(quantity);
+
+				// update product
+				mDbHelper.insertOrUpdateProduct(product);
+
+				productAdapter.notifyDataSetChanged();
+			}
+		});
+
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String s) {

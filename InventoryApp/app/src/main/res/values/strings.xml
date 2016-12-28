@@ -6,8 +6,6 @@
 
     <string name="alert_confirm_delelte_product_title">Delete product</string>
     <string name="alert_confirm_delelte_product_message">Are you sure you want to delete this product?</string>
-    <string name="button_text_yes">YES</string>
-    <string name="button_text_no">NO</string>
     <string name="text_delete_success">Product is deleted successfully!</string>
     <string name="text_delete_fail">Error deleting product! Please try again later!</string>
     <string name="text_data_change_updated">Data updated!</string>
@@ -22,11 +20,23 @@
     <string name="text_ask_call_permission">We need Call permission to make a call to Supplier for you!</string>
 
     <string name="error_product_name_empty">Product name cannot be empty!</string>
+    <string name="error_price_empty">Price name cannot be empty!</string>
+    <string name="error_quantity_empty">Quantity name cannot be empty!</string>
     <string name="error_price_negative">Price value cannot be negative</string>
     <string name="error_quantity_negative">Quantity value cannot be negative</string>
 
     <string name="text_row_product_price">Price:</string>
     <string name="text_row_product_quantity">Quantity:</string>
     <string name="text_row_product_supplier">Supplier:</string>
+
+    <string name="button_text_yes">YES</string>
+    <string name="button_text_no">NO</string>
+    <string name="button_text_contact_supplier">ORDER MORE</string>
+    <string name="button_text_sale">SALE</string>
+    <string name="button_text_save">SAVE</string>
+    <string name="button_text_delete">DELETE</string>
+    <string name="button_text_select_image">SELECT IMAGE</string>
+
+
 
 </resources>

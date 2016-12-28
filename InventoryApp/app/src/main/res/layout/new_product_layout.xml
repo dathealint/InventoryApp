@@ -107,14 +107,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Select Image"/>
+                    android:text="@string/button_text_select_image"/>
 
                 <Button
                     android:id="@+id/btnSave"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Save"/>
+                    android:text="@string/button_text_save"/>
 
             </LinearLayout>
 
@@ -131,21 +131,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Delete"/>
+                    android:text="@string/button_text_delete"/>
 
                 <Button
-                    android:id="@+id/btnSale"
+                    android:id="@+id/btnEditSale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Sale"/>
+                    android:text="@string/button_text_sale"/>
 
                 <Button
                     android:id="@+id/btnOrder"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:text="Order more"/>
+                    android:text="@string/button_text_contact_supplier"/>
 
             </LinearLayout>
 

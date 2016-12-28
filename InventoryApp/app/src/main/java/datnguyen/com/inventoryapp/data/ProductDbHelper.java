@@ -406,6 +406,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			Supplier supplier = new Supplier();
 
 			supplier.setName("Supplier C");
+			supplier.setTel("999999");
 			supplier.setAddress("+test address C");
 			supplier.setEmail("email_supplier_C@gmail.com");
 			insertOrUpdateSupplier(supplier);

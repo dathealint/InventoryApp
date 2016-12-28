@@ -12,6 +12,7 @@ import datnguyen.com.inventoryapp.MainActivity;
 import datnguyen.com.inventoryapp.R;
 
 import static datnguyen.com.inventoryapp.Constants.INVALID_ID;
+import static datnguyen.com.inventoryapp.Constants.INVALID_INT_VALUE;
 
 /**
  * Created by datnguyen on 12/27/16.
@@ -114,6 +115,14 @@ public class Product implements Serializable {
 		// check name empty
 		if (TextUtils.isEmpty(getName())) {
 			return new CustomError(CustomError.CODE_TEXT_EMPTY, MainActivity.getSharedInstance().getString(R.string.error_product_name_empty));
+		}
+
+		if (getPrice() == INVALID_INT_VALUE) {
+			return new CustomError(CustomError.CODE_TEXT_EMPTY, MainActivity.getSharedInstance().getString(R.string.error_price_empty));
+		}
+
+		if (getQuantity() == INVALID_INT_VALUE) {
+			return new CustomError(CustomError.CODE_TEXT_EMPTY, MainActivity.getSharedInstance().getString(R.string.error_quantity_empty));
 		}
 
 		// check price negative

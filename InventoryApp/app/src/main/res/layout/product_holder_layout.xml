@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/imvThumb"
-        android:layout_width="50dp"
-        android:layout_height="70dp"
+        android:layout_width="@dimen/image_product_row_width"
+        android:layout_height="@dimen/image_product_row_height"
         android:layout_margin="@dimen/product_row_image_margin"
         android:layout_gravity="center_horizontal|center_vertical"
         android:scaleType="centerInside"
@@ -47,6 +47,13 @@
             android:id="@+id/tvSupplier"
             android:textSize="@dimen/row_section_size"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnSale"
+            android:textSize="@dimen/row_section_size"
+            android:text="@string/button_text_sale"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
 

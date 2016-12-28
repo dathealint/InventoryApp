@@ -41,6 +41,7 @@ import datnguyen.com.inventoryapp.data.Supplier;
 
 import static datnguyen.com.inventoryapp.Constants.EXTRA_PRODUCT_KEY;
 import static datnguyen.com.inventoryapp.Constants.EXTRA_UPDATE_PRODUCT_RESULT_KEY;
+import static datnguyen.com.inventoryapp.Constants.INVALID_INT_VALUE;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_DELETE_PRODUCT_SUCCESS;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_SUCCESS;
 import static datnguyen.com.inventoryapp.data.Product.getOutputImageFile;
@@ -120,7 +121,7 @@ public class NewProductActivity extends AppCompatActivity {
 		Button btnSave = (Button) findViewById(R.id.btnSave);
 		Button btnDelete = (Button) findViewById(R.id.btnDelete);
 		Button btnOrder = (Button) findViewById(R.id.btnOrder);
-		Button btnSale = (Button) findViewById(R.id.btnSale);
+		Button btnSale = (Button) findViewById(R.id.btnEditSale);
 		Button btnSelectImage = (Button) findViewById(R.id.btnSelectImage);
 
 		// Button Save
@@ -160,6 +161,10 @@ public class NewProductActivity extends AppCompatActivity {
 				}
 				quantity = Math.max(quantity - 1, 0);
 				product.setQuantity(quantity);
+
+				// save to database
+				ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
+				long insertResult = mDbHelper.insertOrUpdateProduct(product);
 
 				refreshUI();
 			}
@@ -220,18 +225,14 @@ public class NewProductActivity extends AppCompatActivity {
 
 		// get all changes
 		product.setName(txtName.getText().toString());
-		int price = 0;
-		if (TextUtils.isEmpty(txtPrice.getText().toString())) {
-			price = 0;
-		} else {
+		int price = INVALID_INT_VALUE;
+		if (!TextUtils.isEmpty(txtPrice.getText().toString())) {
 			price = Integer.valueOf(txtPrice.getText().toString());
 		}
 		product.setPrice(price);
 
-		int quantity = 0;
-		if (TextUtils.isEmpty(txtQuantity.getText().toString())) {
-			quantity = 0;
-		} else {
+		int quantity = INVALID_INT_VALUE;
+		if (!TextUtils.isEmpty(txtQuantity.getText().toString())) {
 			quantity = Integer.valueOf(txtQuantity.getText().toString());
 		}
 		product.setQuantity(quantity);
