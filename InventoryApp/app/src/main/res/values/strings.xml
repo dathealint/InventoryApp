@@ -2,6 +2,7 @@
     <string name="app_name">InventoryApp</string>
     <string name="search_hint">Enter some text to search stories...</string>
     <string name="text_no_result">No matching products found! Try another keyword!</string>
+    <string name="text_welcome">Hello there! Try adding a new record by tapping Menu button and select Add</string>
 
     <string name="alert_confirm_delelte_product_title">Delete product</string>
     <string name="alert_confirm_delelte_product_message">Are you sure you want to delete this product?</string>

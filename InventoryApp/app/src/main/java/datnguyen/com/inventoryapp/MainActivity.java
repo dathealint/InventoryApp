@@ -152,32 +152,49 @@ public class MainActivity extends AppCompatActivity {
 
 			@Override
 			public boolean onQueryTextChange(String s) {
-
-				// hide error message if showing
-				tvErrorMessage.setText("");
-
-				recycleView.setVisibility(View.VISIBLE);
-				tvErrorMessage.setVisibility(View.GONE);
-
 				startSearch(s);
-
 				return true;
 			}
 		});
 
-		// reload data
 		reloadData();
 	}
 
+	private void reloadData() {
+		// reload data
+		ArrayList<Product> allRecords = mDbHelper.getAllProducts();
+		reloadData(allRecords);
+	}
 	/**
 	 * Reload product lists from database and refresh recyclerview
 	 */
-	private void reloadData() {
-		ArrayList<Product> allRecords = mDbHelper.getAllProducts();
+	private void reloadData(ArrayList<Product> list) {
 
 		productList.clear();
-		productList.addAll(allRecords);
+		productList.addAll(list);
 		productAdapter.notifyDataSetChanged();
+
+		refreshUI();
+	}
+
+	private void refreshUI() {
+		if (productList.size() == 0) {
+			// if is searching, show no result message
+			if (searchView.getQuery().toString().trim().length() > 0) {
+				tvErrorMessage.setText(getString(R.string.text_no_result));
+			} else {
+				// show welcome text
+				tvErrorMessage.setText(getString(R.string.text_welcome));
+			}
+
+			recycleView.setVisibility(View.GONE);
+			tvErrorMessage.setVisibility(View.VISIBLE);
+		} else {
+			// hide text message, show recyclerview to present data
+			tvErrorMessage.setText("");
+			recycleView.setVisibility(View.VISIBLE);
+			tvErrorMessage.setVisibility(View.GONE);
+		}
 	}
 
 	/**
@@ -190,14 +207,7 @@ public class MainActivity extends AppCompatActivity {
 
 		// test query from db first
 		ArrayList<Product> searchResult = mDbHelper.searchProduct(keyword);
-
-		productList.clear();
-		productList.addAll(searchResult);
-
-		Log.v(TAG_VIEW, "search result count: " + productList.size());
-
-		productAdapter.notifyDataSetChanged();
-
+		reloadData(searchResult);
 	}
 
 	/**
