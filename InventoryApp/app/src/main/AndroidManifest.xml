@@ -16,10 +16,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NewProductActivity"/>
+        <activity android:name=".NewProductActivity"
+                  android:parentActivityName=".MainActivity"
+            />
     </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
                      android:maxSdkVersion="18" />
+
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
 </manifest>

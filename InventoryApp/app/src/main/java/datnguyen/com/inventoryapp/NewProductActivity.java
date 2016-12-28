@@ -1,15 +1,20 @@
 package datnguyen.com.inventoryapp;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -53,6 +58,7 @@ public class NewProductActivity extends AppCompatActivity {
 
 	private final String TAG_VIEW = getClass().getSimpleName();
 	private static final int REQUEST_CODE_PICK_IMAGE = 1;
+	private static final int REQUEST_CODE_CALL_PERMISSION = 10;
 
 	private Product product;
 
@@ -133,14 +139,20 @@ public class NewProductActivity extends AppCompatActivity {
 		btnOrder.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-
+				if (checkPermissionSuccess(Manifest.permission.CALL_PHONE)) {
+					contactSupplier();
+				}
 			}
 		});
 
 		btnSale.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				// decrease quantity by 1, minimum 0
+				int newQuantity = Math.max(product.getQuantity() - 1, 0);
+				product.setQuantity(newQuantity);
 
+				refreshUI();
 			}
 		});
 
@@ -223,6 +235,29 @@ public class NewProductActivity extends AppCompatActivity {
 		finish();
 	}
 
+	private void contactSupplier() {
+		ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
+		// fins Supplier Info
+		Supplier supplier = mDbHelper.getSupplier(product.getSupplierId());
+
+		Intent intent = null;
+
+		// check phone number first
+		if (!TextUtils.isEmpty(supplier.getTel())) {
+			intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + supplier.getTel()));
+		} else if (!TextUtils.isEmpty(supplier.getEmail())) {
+			intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + supplier.getEmail()));
+
+			intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.contact_supplier_email_subject));
+			String mailContent = String.format(getString(R.string.contact_supplier_email_text), product.getName());
+			intent.putExtra(Intent.EXTRA_TEXT, mailContent);
+		}
+
+		if (intent != null) {
+			startActivity(intent);
+		}
+	}
+
 	private void reloadData() {
 
 		// fetch list suppliers from database
@@ -238,6 +273,10 @@ public class NewProductActivity extends AppCompatActivity {
 		ArrayAdapter<Supplier> supplierAdapter = new ArrayAdapter(this, R.layout.supplier_row_layout, spinnerDataSource);
 		spinnerSupplier.setAdapter(supplierAdapter);
 
+		refreshUI();
+	}
+
+	private void refreshUI() {
 		// is editing existing record
 		// pre-fill all information
 		txtName.setText(product.getName());
@@ -268,8 +307,6 @@ public class NewProductActivity extends AppCompatActivity {
 		}
 	}
 
-
-
 	private void storeBitmapToInternal(Bitmap bitmap, String fileName) {
 		// save image file to local
 		File pictureFile = getOutputImageFile(fileName);
@@ -279,10 +316,8 @@ public class NewProductActivity extends AppCompatActivity {
 
 		FileOutputStream outputStream = null;
 		try {
-
 			outputStream = new FileOutputStream(pictureFile);
 			bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-
 			outputStream.close();
 
 			product.setThumnailPath(fileName);
@@ -291,7 +326,39 @@ public class NewProductActivity extends AppCompatActivity {
 		} finally {
 
 		}
+	}
 
+	private boolean checkPermissionSuccess(String permisson) {
+		if (ContextCompat.checkSelfPermission(this, permisson)
+				!= PackageManager.PERMISSION_GRANTED) {
+
+			if (ActivityCompat.shouldShowRequestPermissionRationale(this, permisson)) {
+				Toast.makeText(this, getString(R.string.text_ask_call_permission), Toast.LENGTH_SHORT).show();
+			}
+
+			// No explanation needed, we can request the permission.
+			ActivityCompat.requestPermissions(this, new String[]{permisson}, REQUEST_CODE_CALL_PERMISSION);
+
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		switch (requestCode) {
+			case REQUEST_CODE_CALL_PERMISSION:
+			{
+				// check if call permisson is granted
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					contactSupplier();
+				} else {
+					// permission denied :(
+				}
+			}
+				break;
+		}
 	}
 
 	// handle activityresult after picking image
@@ -307,13 +374,6 @@ public class NewProductActivity extends AppCompatActivity {
 					// get selected image out of image picker
 					Uri uri = data.getData();
 					try {
-//						URL url = new URL(uri.toString());
-//						File file = new File(url.getFile());
-//						String fileName = file.getName();
-//						if (TextUtils.isEmpty(fileName)) {
-//							fileName =  String.valueOf((new Date()).getTime());
-//						}
-
 						String fileName = String.valueOf((new Date()).getTime());
 
 						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);

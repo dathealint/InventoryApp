@@ -158,6 +158,8 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			// run the delete statement
 			countRowsAffected = database.delete(ProductEntry.TABLE_NAME, null, null);
 			database.setTransactionSuccessful();
+
+			// TODO: delete images in internal storage linked to any products
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -185,6 +187,8 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 
 			countRowsAffected = database.delete(ProductEntry.TABLE_NAME, where, whereArgs);
 			database.setTransactionSuccessful();
+
+			// TODO: delete image in internal storage linked to this product
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -419,6 +423,25 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	public ArrayList<Supplier> getAllSuppliers() {
 
 		return getSuppliers(null, null, SupplierEntry.COLUMN_NAME + " ASC");
+	}
+
+	/**
+	 * Fetch Supplier entry by Id
+	 * @return Supplier Entry matching Id, otherwise return null
+	 */
+	public Supplier getSupplier(long id) {
+
+		// filter result WHERE name starts with T
+		String selection = SupplierEntry._ID + " = ? ";
+		String[] selectionArgs = {"" + id};
+
+		ArrayList<Supplier> list = getSuppliers(selection, selectionArgs, SupplierEntry.COLUMN_NAME + " ASC");
+
+		if (list != null && list.size() > 0) {
+			return list.get(0);
+		}
+
+		return null;
 	}
 
 	/**

@@ -15,4 +15,9 @@
     <string name="menu_item_add">Add</string>
     <string name="title_image_picker">Choose Image for this Product</string>
 
+    <string name="contact_supplier_email_subject">More orders coming...</string>
+    <string name="contact_supplier_email_text">Hello! I\'d like to order more %s!</string>
+
+    <string name="text_ask_call_permission">We need Call permission to make a call to Supplier for you!</string>
+
 </resources>
