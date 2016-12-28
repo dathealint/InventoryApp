@@ -1,7 +1,12 @@
 package datnguyen.com.inventoryapp.data;
 
+import android.util.Log;
+
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
+
+import datnguyen.com.inventoryapp.MainActivity;
 
 import static datnguyen.com.inventoryapp.Constants.INVALID_ID;
 
@@ -87,4 +92,15 @@ public class Product implements Serializable {
 	public void setSupplierName(String supplierName) {
 		this.supplierName = supplierName;
 	}
+
+	public File getImageFile() {
+		File pictureFile = Product.getOutputImageFile(getThumnailPath());
+		return pictureFile;
+	}
+
+	public static File getOutputImageFile(String fileName) {
+		File file = new File(MainActivity.getSharedInstance().getBaseContext().getCacheDir(), fileName);
+		return file;
+	}
+
 }

@@ -3,19 +3,35 @@ package datnguyen.com.inventoryapp;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Date;
 
 import datnguyen.com.inventoryapp.data.Product;
 import datnguyen.com.inventoryapp.data.ProductDbHelper;
@@ -25,6 +41,7 @@ import static datnguyen.com.inventoryapp.Constants.EXTRA_PRODUCT_KEY;
 import static datnguyen.com.inventoryapp.Constants.EXTRA_UPDATE_PRODUCT_RESULT_KEY;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_DELETE_PRODUCT_SUCCESS;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_SUCCESS;
+import static datnguyen.com.inventoryapp.data.Product.getOutputImageFile;
 import static datnguyen.com.inventoryapp.data.ProductDbHelper.DELETION_FAIL_CODE;
 import static datnguyen.com.inventoryapp.data.ProductDbHelper.INSERTION_FAIL_CODE;
 
@@ -34,12 +51,16 @@ import static datnguyen.com.inventoryapp.data.ProductDbHelper.INSERTION_FAIL_COD
 
 public class NewProductActivity extends AppCompatActivity {
 
+	private final String TAG_VIEW = getClass().getSimpleName();
+	private static final int REQUEST_CODE_PICK_IMAGE = 1;
+
 	private Product product;
 
 	private EditText txtName;
 	private EditText txtPrice;
 	private EditText txtQuantity;
 	private Spinner spinnerSupplier;
+	private ImageView imvProduct;
 
 	private ArrayList<Supplier> listSuppliers = new ArrayList();
 
@@ -48,11 +69,15 @@ public class NewProductActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.new_product_layout);
 
+		// show UP button to navi back
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		// grab UI controls
 		txtName = (EditText) findViewById(R.id.txtName);
 		txtPrice = (EditText) findViewById(R.id.txtPrice);
 		txtQuantity = (EditText) findViewById(R.id.txtQuantity);
 		spinnerSupplier = (Spinner) findViewById(R.id.spinnerSupplier);
+		imvProduct = (ImageView) findViewById(R.id.imvProduct);
 
 		registerButtonEventHandlers();
 
@@ -122,7 +147,13 @@ public class NewProductActivity extends AppCompatActivity {
 		btnSelectImage.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				// open Intent Image Picker
+				Intent intent = new Intent();
+				//filter images only, not video
+				intent.setType("image/*");
+				intent.setAction(Intent.ACTION_GET_CONTENT);
 
+				startActivityForResult(Intent.createChooser(intent, getString(R.string.title_image_picker)), REQUEST_CODE_PICK_IMAGE);
 			}
 		});
 
@@ -174,7 +205,7 @@ public class NewProductActivity extends AppCompatActivity {
 			product.setSupplierId(supplier.getId());
 		}
 
-		// TODO: update image
+		// imagepath is already updated
 
 		// save to database
 		ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
@@ -213,6 +244,14 @@ public class NewProductActivity extends AppCompatActivity {
 		txtPrice.setText("" + product.getPrice());
 		txtQuantity.setText("" + product.getQuantity());
 
+		// load image
+		File pictureFile = product.getImageFile();
+		if (pictureFile != null) {
+			// load image from file and assign to imageview
+			Bitmap bitmap = BitmapFactory.decodeFile(pictureFile.getAbsolutePath());
+			imvProduct.setImageBitmap(bitmap);
+		}
+
 		// find index if this supplier Id
 		int index = -1;
 		for (int i = 0; i < listSuppliers.size(); i++) {
@@ -229,4 +268,70 @@ public class NewProductActivity extends AppCompatActivity {
 		}
 	}
 
+
+
+	private void storeBitmapToInternal(Bitmap bitmap, String fileName) {
+		// save image file to local
+		File pictureFile = getOutputImageFile(fileName);
+		if (pictureFile == null) {
+			return;
+		}
+
+		FileOutputStream outputStream = null;
+		try {
+
+			outputStream = new FileOutputStream(pictureFile);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+			outputStream.close();
+
+			product.setThumnailPath(fileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+
+		}
+
+	}
+
+	// handle activityresult after picking image
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		Log.v(TAG_VIEW, "onActivityResult requestCode: " + requestCode + " - resultCode: " + resultCode);
+		switch (requestCode) {
+			case REQUEST_CODE_PICK_IMAGE:
+			{
+				if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+
+					// get selected image out of image picker
+					Uri uri = data.getData();
+					try {
+//						URL url = new URL(uri.toString());
+//						File file = new File(url.getFile());
+//						String fileName = file.getName();
+//						if (TextUtils.isEmpty(fileName)) {
+//							fileName =  String.valueOf((new Date()).getTime());
+//						}
+
+						String fileName = String.valueOf((new Date()).getTime());
+
+						Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+						imvProduct.setImageBitmap(bitmap);
+
+						storeBitmapToInternal(bitmap, fileName);
+
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			break;
+
+		}
+
+	}
 }

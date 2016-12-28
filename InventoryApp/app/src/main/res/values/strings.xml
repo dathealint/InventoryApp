@@ -13,5 +13,6 @@
     <string name="text_product_added_success">New Product is added successfully!</string>
 
     <string name="menu_item_add">Add</string>
+    <string name="title_image_picker">Choose Image for this Product</string>
 
 </resources>

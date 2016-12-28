@@ -4,6 +4,9 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="product_row_image_margin">10dp</dimen>
+    <dimen name="image_product_max_height">200dp</dimen>
+    <dimen name="image_product_max_width">200dp</dimen>
+
 
     <dimen name="row_title_size">15sp</dimen>
     <dimen name="row_section_size">13sp</dimen>

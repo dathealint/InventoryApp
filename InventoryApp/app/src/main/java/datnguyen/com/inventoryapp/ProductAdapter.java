@@ -1,5 +1,7 @@
 package datnguyen.com.inventoryapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,8 +11,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import datnguyen.com.inventoryapp.data.Product;
@@ -64,12 +66,20 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 			this.tvTitle.setText(product.getName());
 
 			// get imageUrl and use connection to download image
-			String imageUrl = product.getThumnailPath();
-			if (imageUrl != null) {
-				Glide.with(MainActivity.getSharedInstance().getApplicationContext()).load(imageUrl).into(this.imvThumb);
-			} else {
-				// show default image
+			File pictureFile = product.getImageFile();
+			Bitmap bitmap = null;
+			if (pictureFile != null) {
+				// load image from file and assign to imageview
+				bitmap = BitmapFactory.decodeFile(pictureFile.getAbsolutePath());
 			}
+
+			if (bitmap != null) {
+				imvThumb.setImageBitmap(bitmap);
+			} else {
+				// use default image if specific bitmap not available
+				imvThumb.setImageDrawable(MainActivity.getSharedInstance().getResources().getDrawable(R.drawable.ic_style_black_24dp));
+			}
+
 		}
 
 	}
