@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
 	public static final int RESULT_CODE_EDIT_PRODUCT_SUCCESS = 101;
 	public static final int RESULT_CODE_EDIT_PRODUCT_FAILURE = 102;
+	public static final int RESULT_CODE_EDIT_PRODUCT_BACK_UP = 103;
 
 	public static final int RESULT_CODE_DELETE_PRODUCT_SUCCESS = 301;
 	public static final int RESULT_CODE_DELETE_PRODUCT_FAILURE = 302;
@@ -69,6 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
 		// when in need to create dummy data, chagne to true.
 		// switch to false to persist data so creating new or deleting products will have changes we can see and test
+		//test suppliers
+		ArrayList<Supplier> listSuppliers = mDbHelper.getAllSuppliers();
+		if (listSuppliers.size() == 0) {
+			mDbHelper.insertDummySuppliers();
+		}
+
 		boolean createDummyData = false;
 		if (createDummyData) {
 			mDbHelper.deleteAllSuppliers();
@@ -277,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
 				if (resultCode == Activity.RESULT_OK) {
 					// check real result from intents
 					int result = data.getExtras().getInt(EXTRA_UPDATE_PRODUCT_RESULT_KEY);
+
 					if (result == RESULT_CODE_EDIT_PRODUCT_SUCCESS) {
 						// update db
 						reloadData();
@@ -287,11 +295,13 @@ public class MainActivity extends AppCompatActivity {
 						reloadData();
 						// show toast to let us know it works
 						showToast(getString(R.string.text_delete_success));
+					} else if (result == RESULT_CODE_EDIT_PRODUCT_BACK_UP) {
+						// update db
+						reloadData();
 					} else {
 						// update error, do nothing
 					}
 				}
-
 			}
 			break;
 			case REQUEST_CODE_ADD_PRODUCT: {

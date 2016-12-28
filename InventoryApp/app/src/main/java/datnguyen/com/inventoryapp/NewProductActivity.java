@@ -18,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,6 +44,8 @@ import static datnguyen.com.inventoryapp.Constants.EXTRA_PRODUCT_KEY;
 import static datnguyen.com.inventoryapp.Constants.EXTRA_UPDATE_PRODUCT_RESULT_KEY;
 import static datnguyen.com.inventoryapp.Constants.INVALID_INT_VALUE;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_DELETE_PRODUCT_SUCCESS;
+import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_BACK_UP;
+import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_FAILURE;
 import static datnguyen.com.inventoryapp.MainActivity.RESULT_CODE_EDIT_PRODUCT_SUCCESS;
 import static datnguyen.com.inventoryapp.data.Product.getOutputImageFile;
 import static datnguyen.com.inventoryapp.data.ProductDbHelper.DELETION_FAIL_CODE;
@@ -83,7 +86,6 @@ public class NewProductActivity extends AppCompatActivity {
 		spinnerSupplier = (Spinner) findViewById(R.id.spinnerSupplier);
 		imvProduct = (ImageView) findViewById(R.id.imvProduct);
 
-		registerButtonEventHandlers();
 		spinnerSupplier.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -113,6 +115,9 @@ public class NewProductActivity extends AppCompatActivity {
 			viewEditActions.setVisibility(View.GONE);
 		}
 
+		registerButtonEventHandlers();
+
+
 		reloadData();
 	}
 
@@ -124,65 +129,68 @@ public class NewProductActivity extends AppCompatActivity {
 		Button btnSale = (Button) findViewById(R.id.btnEditSale);
 		Button btnSelectImage = (Button) findViewById(R.id.btnSelectImage);
 
-		// Button Save
-		btnSave.setOnClickListener(new View.OnClickListener() {
+		View.OnClickListener onClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				updateProduct();
-			}
-		});
+				switch (view.getId()) {
+					case R.id.btnSave:
+					{
+						updateProduct();
+					}
+					break;
+					case R.id.btnDelete:
+					{
+						// show confirm dialog first
+						showDeleteConfirmDialog();
+					}
+					break;
+					case R.id.btnOrder:
+					{
+						if (checkPermissionSuccess(Manifest.permission.CALL_PHONE)) {
+							contactSupplier();
+						}
+					}
+					break;
+					case R.id.btnEditSale:
+					{
+						// decrease quantity by 1, minimum 0
+						int quantity;
+						if (TextUtils.isEmpty(txtQuantity.getText().toString())) {
+							quantity = 0;
+						} else {
+							quantity = Integer.valueOf(txtQuantity.getText().toString());
+						}
+						quantity = Math.max(quantity - 1, 0);
+						product.setQuantity(quantity);
 
-		btnDelete.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				// show confirm dialog first
-				showDeleteConfirmDialog();
-			}
-		});
+						// save to database
+						ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
+						long insertResult = mDbHelper.insertOrUpdateProduct(product);
 
-		btnOrder.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (checkPermissionSuccess(Manifest.permission.CALL_PHONE)) {
-					contactSupplier();
+						refreshUI();
+					}
+					break;
+					case R.id.btnSelectImage:
+					{
+						// open Intent Image Picker
+						Intent intent = new Intent();
+						//filter images only, not video
+						intent.setType("image/*");
+						intent.setAction(Intent.ACTION_GET_CONTENT);
+
+						startActivityForResult(Intent.createChooser(intent, getString(R.string.title_image_picker)), REQUEST_CODE_PICK_IMAGE);
+					}
+					break;
+
 				}
 			}
-		});
+		};
 
-		btnSale.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				// decrease quantity by 1, minimum 0
-				int quantity;
-				if (TextUtils.isEmpty(txtQuantity.getText().toString())) {
-					quantity = 0;
-				} else {
-					quantity = Integer.valueOf(txtQuantity.getText().toString());
-				}
-				quantity = Math.max(quantity - 1, 0);
-				product.setQuantity(quantity);
-
-				// save to database
-				ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
-				long insertResult = mDbHelper.insertOrUpdateProduct(product);
-
-				refreshUI();
-			}
-		});
-
-		btnSelectImage.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				// open Intent Image Picker
-				Intent intent = new Intent();
-				//filter images only, not video
-				intent.setType("image/*");
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-
-				startActivityForResult(Intent.createChooser(intent, getString(R.string.title_image_picker)), REQUEST_CODE_PICK_IMAGE);
-			}
-		});
-
+		btnSave.setOnClickListener(onClickListener);
+		btnDelete.setOnClickListener(onClickListener);
+		btnOrder.setOnClickListener(onClickListener);
+		btnSale.setOnClickListener(onClickListener);
+		btnSelectImage.setOnClickListener(onClickListener);
 	}
 
 	private void showDeleteConfirmDialog() {
@@ -259,7 +267,7 @@ public class NewProductActivity extends AppCompatActivity {
 			Intent resultIntent = new Intent();
 
 			if (insertResult == INSERTION_FAIL_CODE) {
-				resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
+				resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_FAILURE));
 			} else {
 				resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
 			}
@@ -426,6 +434,25 @@ public class NewProductActivity extends AppCompatActivity {
 			break;
 
 		}
+	}
 
+	@Override
+	public void onBackPressed() {
+		Intent resultIntent = new Intent();
+		resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_BACK_UP));
+
+		setResult(Activity.RESULT_OK, resultIntent);
+
+		super.onBackPressed();
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == android.R.id.home) {
+			onBackPressed();
+			return true;
+		} else {
+			return super.onOptionsItemSelected(item);
+		}
 	}
 }
