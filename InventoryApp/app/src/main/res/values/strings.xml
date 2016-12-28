@@ -25,4 +25,8 @@
     <string name="error_price_negative">Price value cannot be negative</string>
     <string name="error_quantity_negative">Quantity value cannot be negative</string>
 
+    <string name="text_row_product_price">Price:</string>
+    <string name="text_row_product_quantity">Quantity:</string>
+    <string name="text_row_product_supplier">Supplier:</string>
+
 </resources>

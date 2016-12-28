@@ -10,6 +10,6 @@
     <dimen name="supplier_row_margin">2dp</dimen>
 
     <dimen name="row_supplier_text_size">15sp</dimen>
-    <dimen name="row_title_size">15sp</dimen>
+    <dimen name="row_title_size">16sp</dimen>
     <dimen name="row_section_size">13sp</dimen>
 </resources>

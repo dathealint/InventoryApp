@@ -52,18 +52,27 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 	public static class ProductHolder extends RecyclerView.ViewHolder {
 
 		private ImageView imvThumb = null;
-		private TextView tvTitle = null;
+		private TextView tvName = null;
+		private TextView tvPrice = null;
+		private TextView tvQuantity = null;
+		private TextView tvSupplier = null;
 		private Product product = null;
 
 		public ProductHolder(View itemView) {
 			super(itemView);
 			this.imvThumb = (ImageView) itemView.findViewById(R.id.imvThumb);
-			this.tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+			this.tvName = (TextView) itemView.findViewById(R.id.tvName);
+			this.tvPrice = (TextView) itemView.findViewById(R.id.tvPrice);
+			this.tvQuantity = (TextView) itemView.findViewById(R.id.tvQuantity);
+			this.tvSupplier = (TextView) itemView.findViewById(R.id.tvSupplier);
 		}
 
 		public void bindProduct(Product product) {
 			this.product = product;
-			this.tvTitle.setText(product.getName());
+			this.tvName.setText(product.getName());
+			this.tvPrice.setText(MainActivity.getSharedInstance().getString(R.string.text_row_product_price) + " " + product.getPrice());
+			this.tvQuantity.setText(MainActivity.getSharedInstance().getString(R.string.text_row_product_quantity) + " " + product.getQuantity());
+			this.tvSupplier.setText(MainActivity.getSharedInstance().getString(R.string.text_row_product_supplier) + " " + product.getSupplierName());
 
 			// get imageUrl and use connection to download image
 			File pictureFile = product.getImageFile();
@@ -77,7 +86,7 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 				imvThumb.setImageBitmap(bitmap);
 			} else {
 				// use default image if specific bitmap not available
-				imvThumb.setImageDrawable(MainActivity.getSharedInstance().getResources().getDrawable(R.drawable.ic_style_black_24dp));
+				imvThumb.setImageDrawable(MainActivity.getSharedInstance().getResources().getDrawable(R.drawable.ic_default_product_thumb));
 			}
 
 		}
