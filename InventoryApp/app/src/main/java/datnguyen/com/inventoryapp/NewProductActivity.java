@@ -324,8 +324,18 @@ public class NewProductActivity extends AppCompatActivity {
 		// is editing existing record
 		// pre-fill all information
 		txtName.setText(product.getName());
-		txtPrice.setText("" + product.getPrice());
-		txtQuantity.setText("" + product.getQuantity());
+
+		if (product.getPrice() == INVALID_INT_VALUE) {
+			txtPrice.setText("");
+		} else {
+			txtPrice.setText("" + product.getPrice());
+		}
+
+		if (product.getQuantity() == INVALID_INT_VALUE) {
+			txtQuantity.setText("");
+		} else {
+			txtQuantity.setText("" + product.getQuantity());
+		}
 
 		// load image
 		File pictureFile = product.getImageFile();

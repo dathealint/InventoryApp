@@ -22,8 +22,8 @@ public class Product implements Serializable {
 
 	private long id = INVALID_ID;
 	private String name;
-	private int price = 0;
-	private int quantity = 0;
+	private int price = INVALID_INT_VALUE;
+	private int quantity = INVALID_INT_VALUE;
 	private Date createdDate;
 	private String thumnailPath = null;
 
