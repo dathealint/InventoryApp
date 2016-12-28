@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity {
 		productAdapter.setOnClickProductListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				// hide keyboard and remove focus of searchbar
+				searchView.clearFocus();
+
 				// get position
 				int position = (int) view.getTag();
 				Product product = productList.get(position);
@@ -143,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
 		searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String s) {
-
 				searchView.clearFocus();
 				return true;
 			}
