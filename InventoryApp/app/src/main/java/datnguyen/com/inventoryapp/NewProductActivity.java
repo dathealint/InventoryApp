@@ -207,8 +207,21 @@ public class NewProductActivity extends AppCompatActivity {
 
 		// get all changes
 		product.setName(txtName.getText().toString());
-		product.setPrice(Integer.valueOf(txtPrice.getText().toString()));
-		product.setQuantity(Integer.valueOf(txtQuantity.getText().toString()));
+		int price = 0;
+		if (TextUtils.isEmpty(txtPrice.getText().toString())) {
+			price = 0;
+		} else {
+			price = Integer.valueOf(txtPrice.getText().toString());
+		}
+		product.setPrice(price);
+
+		int quantity = 0;
+		if (TextUtils.isEmpty(txtQuantity.getText().toString())) {
+			quantity = 0;
+		} else {
+			quantity = Integer.valueOf(txtQuantity.getText().toString());
+		}
+		product.setQuantity(quantity);
 
 		if (listSuppliers != null && listSuppliers.size() > 0) {
 			// get selecting supplier

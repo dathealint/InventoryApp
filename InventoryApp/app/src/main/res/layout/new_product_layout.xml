@@ -58,7 +58,7 @@
 
         <EditText
             android:id="@+id/txtPrice"
-            android:inputType="numberDecimal"
+            android:inputType="numberSigned"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
