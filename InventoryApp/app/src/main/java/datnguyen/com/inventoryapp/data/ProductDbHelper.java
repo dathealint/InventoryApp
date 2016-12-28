@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -148,6 +149,33 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	}
 
 	/**
+	 * Delete one Product from database
+	 * @return number of row affected
+	 */
+	public long deleteProduct(Product product) {
+		SQLiteDatabase database = getWritableDatabase();
+
+		long countRowsAffected = 0;
+		// wrap deletion in transaction
+		database.beginTransaction();
+		try {
+			// run the delete statement
+			String where = ProductEntry._ID + " = ?";
+			String[] whereArgs = { String.valueOf(product.getId())};
+
+			countRowsAffected = database.delete(SupplierEntry.TABLE_NAME, where, whereArgs);
+			database.setTransactionSuccessful();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			// end transaction
+			database.endTransaction();
+		}
+
+		return countRowsAffected;
+	}
+
+	/**
 	 * Fetch Product entries from database
 	 * @param selection WHERE condition, e.g. "NAME LIKE ?"
 	 * @param selectionArgs values to pass into selection
@@ -159,27 +187,26 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 		ArrayList<Product> results = new ArrayList();
 
 		SQLiteDatabase database = getReadableDatabase();
+
+		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+		queryBuilder.setTables(ProductEntry.TABLE_NAME + " INNER JOIN " + SupplierEntry.TABLE_NAME +
+				" ON " + ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_SUPPLIER_ID + " = " + SupplierEntry.TABLE_NAME + "." + SupplierEntry._ID);
+
 		// a projection specifies which columns from database will be querying
-
-		selection = (selection == null) ? " " : selection;
-		sortOrder = (sortOrder == null) ? " " : sortOrder;
-		String query = "SELECT A.*, B.? FROM  ? A INNER JOIN ? B ON A.?=B.? WHERE " + selection + " " + sortOrder;
-
-		// A: ProductEntry, B: SupplierEntry
-		String[] args = {
-				SupplierEntry.COLUMN_NAME,
-				ProductEntry.TABLE_NAME,
-				SupplierEntry.TABLE_NAME,
-				ProductEntry.COLUMN_SUPPLIER_ID,
-				SupplierEntry._ID
+		String[] projection = {
+				ProductEntry.TABLE_NAME + "." + ProductEntry._ID,
+				ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME,
+				ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_PRICE,
+				ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_QUANTITY,
+				ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_IMAGE_PATH,
+				ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_CREATED_DATE,
+				ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_SUPPLIER_ID,
+				SupplierEntry.TABLE_NAME + "." + SupplierEntry.COLUMN_NAME + " AS SupplierName"
 		};
 
-		ArrayList listArgs = new ArrayList(Arrays.asList(args));
-		listArgs.addAll(Arrays.asList(selectionArgs));
+		Cursor cursor = queryBuilder.query(database, projection, selection, selectionArgs, null, null, sortOrder);
 
-		Cursor cursor = database.rawQuery(query, (String[])listArgs.toArray());
-
-//		Cursor cursor = database.query(ProductEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 		while(cursor.moveToNext()) {
 
 			// get info out of cursor
@@ -190,7 +217,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			String imagePath = cursor.getString(cursor.getColumnIndex(ProductEntry.COLUMN_IMAGE_PATH));
 			long createdDate = cursor.getLong(cursor.getColumnIndex(ProductEntry.COLUMN_CREATED_DATE));
 			long supplierId = cursor.getLong(cursor.getColumnIndex(ProductEntry.COLUMN_SUPPLIER_ID));
-			String supplierName = cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_NAME));
+			String supplierName = cursor.getString(cursor.getColumnIndex("SupplierName"));
 
 			Product product = new Product();
 			product.setId(id);
@@ -214,7 +241,8 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	 * @return list of all Product entries from database
 	 */
 	public ArrayList<Product> getAllProducts() {
-		return getProducts(null, null, null);
+
+		return getProducts(null, null, ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " ASC");
 	}
 
 	/**
@@ -223,10 +251,24 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	 */
 	public ArrayList<Product> getProductsNameStartWith(String prefix) {
 		// filter result WHERE name starts with T
-		String selection = ProductEntry.COLUMN_NAME + " LIKE ?";
+		String selection = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " LIKE ?";
 		String[] selectionArgs = { prefix + "%" };
 
-		String sortOrder = ProductEntry.COLUMN_NAME + " ASC";
+		String sortOrder = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " ASC";
+
+		return getProducts(selection, selectionArgs, sortOrder);
+	}
+
+	/**
+	 * Fetch Product entries from database matching name starting with provided string
+	 * @return list of sorted Products from database matching conditions
+	 */
+	public ArrayList<Product> searchProduct(String keyword) {
+		// filter result WHERE name starts with T
+		String selection = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " LIKE ? ";
+		String[] selectionArgs = { "%" + keyword + "%" };
+
+		String sortOrder = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " ASC ";
 
 		return getProducts(selection, selectionArgs, sortOrder);
 	}
@@ -253,7 +295,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 				// put Id to values, so database can replace/update if exists
 				values.put(SupplierEntry._ID, supplier.getId());
 			}
-			
+
 			// put info to content values
 			values.put(SupplierEntry.COLUMN_NAME, supplier.getName());
 
@@ -286,6 +328,8 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 
 		return insertResult;
 	}
+
+
 
 	/**
 	 * Delete all Suppliers in database
@@ -345,6 +389,64 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			insertOrUpdateSupplier(supplier);
 		}
 
+	}
+
+
+	/**
+	 * Fetch Supplier entries from database
+	 * @return list of all Supplier entries from database
+	 */
+	public ArrayList<Supplier> getAllSuppliers() {
+
+		return getSuppliers(null, null, SupplierEntry.COLUMN_NAME + " ASC");
+	}
+
+	/**
+	 * Fetch Supplier entries from database
+	 * @param selection WHERE condition, e.g. "NAME LIKE ?"
+	 * @param selectionArgs values to pass into selection
+	 * @param sortOrder sortOrder to sort result records
+	 * @return list of sorted Suppliers from database matching conditions
+	 */
+	public ArrayList<Supplier> getSuppliers(String selection, String[] selectionArgs, String sortOrder) {
+
+		ArrayList<Supplier> results = new ArrayList();
+
+		SQLiteDatabase database = getReadableDatabase();
+		// a projection specifies which columns from database will be querying
+		String[] projection = {
+				SupplierEntry._ID,
+				SupplierEntry.COLUMN_NAME,
+				SupplierEntry.COLUMN_ADDRESS,
+				SupplierEntry.COLUMN_TEL,
+				SupplierEntry.COLUMN_EMAIL,
+				SupplierEntry.COLUMN_CREATED_DATE
+		};
+
+		Cursor cursor = database.query(SupplierEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+		while(cursor.moveToNext()) {
+
+			// get info out of cursor
+			long id = cursor.getLong(cursor.getColumnIndex(SupplierEntry._ID));
+			String name = cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_NAME));
+			String address = cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_ADDRESS));
+			String tel = cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_TEL));
+			String email = cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_EMAIL));
+			long createdDate = cursor.getLong(cursor.getColumnIndex(SupplierEntry.COLUMN_CREATED_DATE));
+
+			Supplier supplier = new Supplier();
+			supplier.setId(id);
+			supplier.setName(name);
+			supplier.setAddress(address);
+			supplier.setTel(tel);
+			supplier.setEmail(email);
+			supplier.setCreatedDate(new Date(createdDate));
+
+			results.add(supplier);
+		}
+
+		cursor.close();
+		return results;
 	}
 
 }
