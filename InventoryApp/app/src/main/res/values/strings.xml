@@ -20,4 +20,8 @@
 
     <string name="text_ask_call_permission">We need Call permission to make a call to Supplier for you!</string>
 
+    <string name="error_product_name_empty">Product name cannot be empty!</string>
+    <string name="error_price_negative">Price value cannot be negative</string>
+    <string name="error_quantity_negative">Quantity value cannot be negative</string>
+
 </resources>

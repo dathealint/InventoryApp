@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import datnguyen.com.inventoryapp.data.Product;
 import datnguyen.com.inventoryapp.data.ProductDbHelper;
@@ -63,10 +62,13 @@ public class MainActivity extends AppCompatActivity {
 		tvErrorMessage = (TextView) findViewById(R.id.tvErrorMessage);
 		tvErrorMessage.setVisibility(View.GONE);
 
+		// grab a static instance of MainActivity
 		mSharedInstance = this;
 
 		mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
 
+		// when in need to create dummy data, chagne to true.
+		// switch to false to persist data so creating new or deleting products will have changes we can see and test
 		boolean createDummyData = false;
 		if (createDummyData) {
 			mDbHelper.deleteAllSuppliers();
@@ -117,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
 			}
 		}
 
-
 		productAdapter = new ProductAdapter(productList);
 
 		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -129,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View view) {
 				// get position
-				int position = (int)view.getTag();
+				int position = (int) view.getTag();
 				Product product = productList.get(position);
 				// open detail view
 				Intent intent = new Intent(getApplicationContext(), NewProductActivity.class);
@@ -166,9 +167,11 @@ public class MainActivity extends AppCompatActivity {
 
 		// reload data
 		reloadData();
-
 	}
 
+	/**
+	 * Reload product lists from database and refresh recyclerview
+	 */
 	private void reloadData() {
 		ArrayList<Product> allRecords = mDbHelper.getAllProducts();
 
@@ -179,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
 	/**
 	 * Start searching by sending search query to BookService, and update UI when get result
+	 *
 	 * @param keyword: keyword to search
 	 */
 	private void startSearch(String keyword) {
@@ -196,11 +200,24 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+	/**
+	 * open NewProductActivity to either create a new product or editing an existing one
+	 */
 	private void openAddNewActivity() {
 		// open detail view
 		Intent intent = new Intent(getApplicationContext(), NewProductActivity.class);
 
 		startActivityForResult(intent, REQUEST_CODE_ADD_PRODUCT);
+	}
+
+	/**
+	 * show toast
+	 * TODO: later will move this method to a separated CommonUtilities class which contains all common and necessary methods like this.
+	 * @param text to show in toast
+	 */
+	public void showToast(String text) {
+		// show toast to let us know it works
+		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -224,8 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
 		Log.v(TAG_VIEW, "onActivityResult requestCode: " + requestCode + " - resultCode: " + resultCode);
 		switch (requestCode) {
-			case REQUEST_CODE_EDIT_PRODUCT:
-			{
+			case REQUEST_CODE_EDIT_PRODUCT: {
 				if (resultCode == Activity.RESULT_OK) {
 					// check real result from intents
 					int result = data.getExtras().getInt(EXTRA_UPDATE_PRODUCT_RESULT_KEY);
@@ -233,21 +249,20 @@ public class MainActivity extends AppCompatActivity {
 						// update db
 						reloadData();
 						// show toast to let us know it works
-						Toast.makeText(this, getString(R.string.text_data_change_updated), Toast.LENGTH_SHORT).show();
+						showToast(getString(R.string.text_data_change_updated));
 					} else if (result == RESULT_CODE_DELETE_PRODUCT_SUCCESS) {
 						// update db
 						reloadData();
 						// show toast to let us know it works
-						Toast.makeText(this, getString(R.string.text_delete_success), Toast.LENGTH_SHORT).show();
+						showToast(getString(R.string.text_delete_success));
 					} else {
 						// update error, do nothing
 					}
 				}
 
 			}
-				break;
-			case REQUEST_CODE_ADD_PRODUCT:
-			{
+			break;
+			case REQUEST_CODE_ADD_PRODUCT: {
 				if (resultCode == Activity.RESULT_OK) {
 					// check real result from intents
 					int result = data.getExtras().getInt(EXTRA_UPDATE_PRODUCT_RESULT_KEY);

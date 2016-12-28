@@ -18,6 +18,8 @@
 
         <EditText
             android:id="@+id/txtName"
+            android:inputType="text"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -36,6 +38,8 @@
 
         <EditText
             android:id="@+id/txtQuantity"
+            android:inputType="numberSigned"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -54,6 +58,8 @@
 
         <EditText
             android:id="@+id/txtPrice"
+            android:inputType="numberDecimal"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
@@ -72,6 +78,8 @@
 
         <Spinner
             android:id="@+id/spinnerSupplier"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:minHeight="@dimen/supplier_row_min_height"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"></Spinner>
 
@@ -80,6 +88,7 @@
     <LinearLayout
         android:gravity="center_horizontal"
         android:orientation="horizontal"
+        android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -109,6 +118,7 @@
     <LinearLayout
         android:gravity="center_horizontal"
         android:orientation="horizontal"
+        android:layout_margin="@dimen/activity_vertical_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

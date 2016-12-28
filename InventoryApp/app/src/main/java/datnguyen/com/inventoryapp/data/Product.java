@@ -1,12 +1,15 @@
 package datnguyen.com.inventoryapp.data;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
+import datnguyen.com.inventoryapp.CustomError;
 import datnguyen.com.inventoryapp.MainActivity;
+import datnguyen.com.inventoryapp.R;
 
 import static datnguyen.com.inventoryapp.Constants.INVALID_ID;
 
@@ -101,6 +104,25 @@ public class Product implements Serializable {
 	public static File getOutputImageFile(String fileName) {
 		File file = new File(MainActivity.getSharedInstance().getBaseContext().getCacheDir(), fileName);
 		return file;
+	}
+
+	public CustomError validateEntry() {
+		// check name empty
+		if (TextUtils.isEmpty(getName())) {
+			return new CustomError(CustomError.CODE_TEXT_EMPTY, MainActivity.getSharedInstance().getString(R.string.error_product_name_empty));
+		}
+
+		// check price negative
+		if (getPrice() < 0) {
+			return new CustomError(CustomError.CODE_NUMBER_NEGATIVE, MainActivity.getSharedInstance().getString(R.string.error_price_negative));
+		}
+
+		// check quantity negative
+		if (getQuantity() < 0) {
+			return new CustomError(CustomError.CODE_NUMBER_NEGATIVE, MainActivity.getSharedInstance().getString(R.string.error_quantity_negative));
+		}
+
+		return null;
 	}
 
 }

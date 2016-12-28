@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -32,10 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Date;
 
 import datnguyen.com.inventoryapp.data.Product;
@@ -193,7 +189,7 @@ public class NewProductActivity extends AppCompatActivity {
 		Intent resultIntent = new Intent();
 
 		if (deleteResult == DELETION_FAIL_CODE) {
-			Toast.makeText(this, getString(R.string.text_delete_fail), Toast.LENGTH_SHORT).show();
+			MainActivity.getSharedInstance().showToast(getString(R.string.text_delete_fail));
 		} else {
 			// delete success, set result to OK and go back to main activity
 			resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_DELETE_PRODUCT_SUCCESS));
@@ -204,6 +200,9 @@ public class NewProductActivity extends AppCompatActivity {
 
 	}
 
+	/**
+	 * update product using information from screen: name, price, quantity
+	 */
 	private void updateProduct() {
 
 		// get all changes
@@ -219,20 +218,31 @@ public class NewProductActivity extends AppCompatActivity {
 
 		// imagepath is already updated
 
-		// save to database
-		ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
-		long insertResult = mDbHelper.insertOrUpdateProduct(product);
-		Intent resultIntent = new Intent();
+		// validate first
+		CustomError error = product.validateEntry();
 
-		if (insertResult == INSERTION_FAIL_CODE) {
-			resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
+		if (error != null) {
+			// show error
+			MainActivity.getSharedInstance().showToast(error.getErrorMessage());
 		} else {
-			resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
+
+			// save to database
+			ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
+			long insertResult = mDbHelper.insertOrUpdateProduct(product);
+			Intent resultIntent = new Intent();
+
+			if (insertResult == INSERTION_FAIL_CODE) {
+				resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
+			} else {
+				resultIntent.putExtra(EXTRA_UPDATE_PRODUCT_RESULT_KEY, Integer.valueOf(RESULT_CODE_EDIT_PRODUCT_SUCCESS));
+			}
+
+			setResult(Activity.RESULT_OK, resultIntent);
+
+			finish();
 		}
 
-		setResult(Activity.RESULT_OK, resultIntent);
 
-		finish();
 	}
 
 	private void contactSupplier() {
@@ -333,7 +343,7 @@ public class NewProductActivity extends AppCompatActivity {
 				!= PackageManager.PERMISSION_GRANTED) {
 
 			if (ActivityCompat.shouldShowRequestPermissionRationale(this, permisson)) {
-				Toast.makeText(this, getString(R.string.text_ask_call_permission), Toast.LENGTH_SHORT).show();
+				MainActivity.getSharedInstance().showToast(getString(R.string.text_ask_call_permission));
 			}
 
 			// No explanation needed, we can request the permission.
@@ -348,8 +358,7 @@ public class NewProductActivity extends AppCompatActivity {
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		switch (requestCode) {
-			case REQUEST_CODE_CALL_PERMISSION:
-			{
+			case REQUEST_CODE_CALL_PERMISSION: {
 				// check if call permisson is granted
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					contactSupplier();
@@ -357,7 +366,7 @@ public class NewProductActivity extends AppCompatActivity {
 					// permission denied :(
 				}
 			}
-				break;
+			break;
 		}
 	}
 
@@ -367,8 +376,7 @@ public class NewProductActivity extends AppCompatActivity {
 
 		Log.v(TAG_VIEW, "onActivityResult requestCode: " + requestCode + " - resultCode: " + resultCode);
 		switch (requestCode) {
-			case REQUEST_CODE_PICK_IMAGE:
-			{
+			case REQUEST_CODE_PICK_IMAGE: {
 				if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
 
 					// get selected image out of image picker
