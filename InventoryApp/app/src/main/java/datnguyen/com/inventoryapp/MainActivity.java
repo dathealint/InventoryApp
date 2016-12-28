@@ -8,6 +8,8 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -27,8 +29,14 @@ public class MainActivity extends AppCompatActivity {
 
 	private final String TAG_VIEW = getClass().getSimpleName();
 	public static final int REQUEST_CODE_EDIT_PRODUCT = 100;
+	public static final int REQUEST_CODE_ADD_PRODUCT = 200;
+
 	public static final int RESULT_CODE_EDIT_PRODUCT_SUCCESS = 101;
 	public static final int RESULT_CODE_EDIT_PRODUCT_FAILURE = 102;
+
+	public static final int RESULT_CODE_DELETE_PRODUCT_SUCCESS = 301;
+	public static final int RESULT_CODE_DELETE_PRODUCT_FAILURE = 302;
+
 
 	private SearchView searchView = null;
 	private RecyclerView recycleView = null;
@@ -110,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 
-
 		productAdapter = new ProductAdapter(productList);
 
 		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -189,6 +196,28 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+	private void openAddNewActivity() {
+		// open detail view
+		Intent intent = new Intent(getApplicationContext(), NewProductActivity.class);
+
+		startActivityForResult(intent, REQUEST_CODE_ADD_PRODUCT);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		getMenuInflater().inflate(R.menu.home_menu_layout, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.menuAdd) {
+			openAddNewActivity();
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -204,7 +233,12 @@ public class MainActivity extends AppCompatActivity {
 						// update db
 						reloadData();
 						// show toast to let us know it works
-						Toast.makeText(this, "Data updated!", Toast.LENGTH_SHORT).show();
+						Toast.makeText(this, getString(R.string.text_data_change_updated), Toast.LENGTH_SHORT).show();
+					} else if (result == RESULT_CODE_DELETE_PRODUCT_SUCCESS) {
+						// update db
+						reloadData();
+						// show toast to let us know it works
+						Toast.makeText(this, getString(R.string.text_delete_success), Toast.LENGTH_SHORT).show();
 					} else {
 						// update error, do nothing
 					}
@@ -212,6 +246,23 @@ public class MainActivity extends AppCompatActivity {
 
 			}
 				break;
+			case REQUEST_CODE_ADD_PRODUCT:
+			{
+				if (resultCode == Activity.RESULT_OK) {
+					// check real result from intents
+					int result = data.getExtras().getInt(EXTRA_UPDATE_PRODUCT_RESULT_KEY);
+					if (result == RESULT_CODE_EDIT_PRODUCT_SUCCESS) {
+						// update db
+						reloadData();
+
+					} else {
+						// update error, do nothing
+					}
+				}
+
+			}
+			break;
+
 		}
 	}
 }

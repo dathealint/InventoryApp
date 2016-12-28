@@ -26,6 +26,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1; // first version
 	private static final String DATABASE_NAME = "product.db";
 	public static final int INSERTION_FAIL_CODE = -1;
+	public static final int DELETION_FAIL_CODE = -1;
 
 	private static ProductDbHelper sharedInstance = null;
 
@@ -182,7 +183,7 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 			String where = ProductEntry._ID + " = ?";
 			String[] whereArgs = { String.valueOf(product.getId())};
 
-			countRowsAffected = database.delete(SupplierEntry.TABLE_NAME, where, whereArgs);
+			countRowsAffected = database.delete(ProductEntry.TABLE_NAME, where, whereArgs);
 			database.setTransactionSuccessful();
 		} catch (Exception ex) {
 			ex.printStackTrace();
