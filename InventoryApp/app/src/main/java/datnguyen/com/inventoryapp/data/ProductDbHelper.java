@@ -273,20 +273,6 @@ public class ProductDbHelper extends SQLiteOpenHelper {
 	 * Fetch Product entries from database matching name starting with provided string
 	 * @return list of sorted Products from database matching conditions
 	 */
-	public ArrayList<Product> getProductsNameStartWith(String prefix) {
-		// filter result WHERE name starts with T
-		String selection = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " LIKE ?";
-		String[] selectionArgs = { prefix + "%" };
-
-		String sortOrder = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " ASC";
-
-		return getProducts(selection, selectionArgs, sortOrder);
-	}
-
-	/**
-	 * Fetch Product entries from database matching name starting with provided string
-	 * @return list of sorted Products from database matching conditions
-	 */
 	public ArrayList<Product> searchProduct(String keyword) {
 		// filter result WHERE name starts with T
 		String selection = ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_NAME + " LIKE ? ";

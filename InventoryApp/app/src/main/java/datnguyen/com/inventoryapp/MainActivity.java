@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity {
 	public static final int RESULT_CODE_EDIT_PRODUCT_BACK_UP = 103;
 
 	public static final int RESULT_CODE_DELETE_PRODUCT_SUCCESS = 301;
-	public static final int RESULT_CODE_DELETE_PRODUCT_FAILURE = 302;
-
 
 	private SearchView searchView = null;
 	private RecyclerView recycleView = null;

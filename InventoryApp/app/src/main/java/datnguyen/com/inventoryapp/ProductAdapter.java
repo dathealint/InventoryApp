@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -22,12 +21,6 @@ import datnguyen.com.inventoryapp.data.Product;
  */
 
 public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-	private final int VIEW_TYPE_ITEM = 1;
-	private final int VIEW_TYPE_PROGRESSBAR = 0;
-	private boolean isFooterEnabled = false;
-
-	private boolean isLoadingmore = false;
 
 	private ArrayList<Product> productList;
 	private View.OnClickListener onClickListener;
@@ -45,14 +38,6 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 		this.productList = list;
 	}
 
-	public void setFooterEnabled(boolean footerEnabled) {
-		isFooterEnabled = footerEnabled;
-	}
-
-	public void loadmoreCompleted() {
-		isLoadingmore = false;
-	}
-
 	// nested class for ViewHolder
 	public static class ProductHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -62,8 +47,6 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 		private TextView tvQuantity = null;
 		private TextView tvSupplier = null;
 		private Button btnSale = null;
-
-		private Product product = null;
 
 		private View.OnClickListener onBtnSaleClickListenerHolder;
 
@@ -83,7 +66,6 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 		}
 
 		public void bindProduct(Product product, int position) {
-			this.product = product;
 			this.tvName.setText(product.getName());
 			this.tvPrice.setText(MainActivity.getSharedInstance().getString(R.string.text_row_product_price) + " " + product.getPrice());
 			this.tvQuantity.setText(MainActivity.getSharedInstance().getString(R.string.text_row_product_quantity) + " " + product.getQuantity());
@@ -119,68 +101,36 @@ public class ProductAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
 	}
 
-	public static class LoadmoreHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-		private ProgressBar progressBar = null;
-
-		public LoadmoreHolder(View itemView) {
-			super(itemView);
-			this.progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
-		}
-
-		public void bindLoadmore(boolean isLoading) {
-			this.progressBar.setIndeterminate(isLoading);
-		}
-
-		@Override
-		public void onClick(View view) {
-			Log.v("ProductHolder", "DID CLICK PROGRESS HOLDER");
-		}
-	}
-
-
 	@Override
 	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 		LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
 		RecyclerView.ViewHolder viewHolder;
-		if (viewType == VIEW_TYPE_ITEM) {
-			View inflatedView = inflater.inflate(R.layout.product_holder_layout, parent, false);
-			viewHolder = new ProductHolder(inflatedView);
-		} else {
-			View inflatedView = inflater.inflate(R.layout.loadmore_holder_layout, parent, false);
-			viewHolder = new LoadmoreHolder(inflatedView);
-		}
+		View inflatedView = inflater.inflate(R.layout.product_holder_layout, parent, false);
+		viewHolder = new ProductHolder(inflatedView);
 
 		return viewHolder;
 	}
 
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-		if (holder instanceof ProductHolder) {
-			Product product = productList.get(position);
+		Product product = productList.get(position);
 
-			ProductHolder productHolder = (ProductHolder) holder;
-			productHolder.bindProduct(product, position);
-			productHolder.itemView.setTag(position);
-			productHolder.itemView.setOnClickListener(onClickListener);
-			productHolder.setOnBtnSaleClickListener(this.onBtnSaleClickListener);
-		} else {
-			((LoadmoreHolder) holder).bindLoadmore(true);
-		}
+		ProductHolder productHolder = (ProductHolder) holder;
+		productHolder.bindProduct(product, position);
+		productHolder.itemView.setTag(position);
+		productHolder.itemView.setOnClickListener(onClickListener);
+		productHolder.setOnBtnSaleClickListener(this.onBtnSaleClickListener);
 	}
 
 	@Override
 	public int getItemCount() {
 		Log.v("Adapter", "getItemCount: " + productList.size());
-
-		return (isFooterEnabled) ? productList.size() + 1 : productList.size();
+		return productList.size();
 	}
 
 	@Override
 	public int getItemViewType(int position) {
-		if (isFooterEnabled && position >= productList.size()) {
-			return VIEW_TYPE_PROGRESSBAR;
-		}
-		return VIEW_TYPE_ITEM;
+		return 0;
 	}
 }

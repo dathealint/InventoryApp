@@ -27,7 +27,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -133,26 +132,22 @@ public class NewProductActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View view) {
 				switch (view.getId()) {
-					case R.id.btnSave:
-					{
+					case R.id.btnSave: {
 						updateProduct();
 					}
 					break;
-					case R.id.btnDelete:
-					{
+					case R.id.btnDelete: {
 						// show confirm dialog first
 						showDeleteConfirmDialog();
 					}
 					break;
-					case R.id.btnOrder:
-					{
+					case R.id.btnOrder: {
 						if (checkPermissionSuccess(Manifest.permission.CALL_PHONE)) {
 							contactSupplier();
 						}
 					}
 					break;
-					case R.id.btnEditSale:
-					{
+					case R.id.btnEditSale: {
 						// decrease quantity by 1, minimum 0
 						int quantity;
 						if (TextUtils.isEmpty(txtQuantity.getText().toString())) {
@@ -165,13 +160,12 @@ public class NewProductActivity extends AppCompatActivity {
 
 						// save to database
 						ProductDbHelper mDbHelper = ProductDbHelper.getDbHelper(getApplicationContext());
-						long insertResult = mDbHelper.insertOrUpdateProduct(product);
+						mDbHelper.insertOrUpdateProduct(product);
 
 						refreshUI();
 					}
 					break;
-					case R.id.btnSelectImage:
-					{
+					case R.id.btnSelectImage: {
 						// open Intent Image Picker
 						Intent intent = new Intent();
 						//filter images only, not video
